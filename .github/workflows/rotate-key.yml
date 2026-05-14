@@ -64,98 +64,23 @@ jobs:
           git push
           cd ..
 
-      - name: Write hidden files to public repo
+      - name: Sync files to public repo
         run: |
           KEY=$(cat private/key.txt)
           TOKEN=$(cat private/token.txt)
+          TIMESTAMP=$(date +%s)
           printf "%s" "$KEY" > d8f2a1.dat
+          printf "%s" "${TOKEN}${TIMESTAMP}" > t9x3b7.dat.tmp
           printf "%s" "$TOKEN" > t9x3b7.dat
-
-      - name: Build key page
-        run: |
-          KEY=$(cat private/key.txt)
-          TOKEN=$(cat private/token.txt)
-          cat > index.html << 'PAGESTART'
-          <!DOCTYPE html>
-          <html lang="en">
-          <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Logic Hub</title>
-          <meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate">
-          <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-          <style>
-          *{margin:0;padding:0;box-sizing:border-box}
-          body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#fff;min-height:100vh;display:flex;justify-content:center;align-items:center;overflow:hidden}
-          body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 50% 0%,rgba(212,175,55,.08) 0%,transparent 60%),radial-gradient(ellipse at 80% 80%,rgba(212,175,55,.03) 0%,transparent 50%);pointer-events:none}
-          .container{position:relative;width:100%;max-width:440px;padding:20px}
-          .card{background:linear-gradient(145deg,rgba(20,20,20,.95),rgba(12,12,12,.98));border:1px solid rgba(212,175,55,.15);border-radius:16px;padding:48px 36px;text-align:center;backdrop-filter:blur(20px);box-shadow:0 0 60px rgba(0,0,0,.5),0 0 120px rgba(212,175,55,.03);animation:fadeIn .6s ease-out}
-          @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-          .logo{width:48px;height:48px;margin:0 auto 24px;background:linear-gradient(135deg,#d4af37,#b8960c);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:600;color:#0a0a0a;box-shadow:0 4px 20px rgba(212,175,55,.2)}
-          .logo-error{background:linear-gradient(135deg,#e74c3c,#c0392b)}
-          .title{font-size:20px;font-weight:600;color:#fff;letter-spacing:.5px;margin-bottom:6px}
-          .title-error{color:#e74c3c}
-          .subtitle{font-size:13px;color:rgba(255,255,255,.35);font-weight:300;margin-bottom:32px;line-height:1.6}
-          .key-container{background:rgba(212,175,55,.06);border:1px solid rgba(212,175,55,.12);border-radius:12px;padding:20px;margin-bottom:24px;cursor:pointer;transition:all .3s ease}
-          .key-container:hover{border-color:rgba(212,175,55,.3);background:rgba(212,175,55,.1)}
-          .key-label{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:rgba(212,175,55,.6);margin-bottom:12px;font-weight:500}
-          .key-value{font-family:'JetBrains Mono',monospace;font-size:22px;color:#d4af37;letter-spacing:3px;font-weight:500;user-select:all;word-break:break-all}
-          .copy-btn{width:100%;padding:14px;background:linear-gradient(135deg,#d4af37,#b8960c);color:#0a0a0a;border:none;border-radius:10px;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .3s ease;letter-spacing:.5px;margin-bottom:24px}
-          .copy-btn:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(212,175,55,.3)}
-          .copy-btn.copied{background:linear-gradient(135deg,#2ecc71,#27ae60)}
-          .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
-          .info-item{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:12px;text-align:left}
-          .info-item .label{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.3);margin-bottom:4px}
-          .info-item .value{font-size:12px;color:rgba(255,255,255,.7)}
-          .footer{font-size:11px;color:rgba(255,255,255,.2);line-height:1.6}
-          .divider{width:40px;height:1px;background:rgba(212,175,55,.2);margin:0 auto 20px}
-          .status-dot{display:inline-block;width:6px;height:6px;background:#2ecc71;border-radius:50%;margin-right:6px;animation:pulse 2s infinite}
-          @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
-          .error-box{background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:10px;padding:20px;margin-bottom:20px}
-          .error-box p{font-size:13px;color:rgba(255,255,255,.5);line-height:1.6}
-          .spinner{width:24px;height:24px;border:2px solid rgba(212,175,55,.1);border-top-color:#d4af37;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px}
-          @keyframes spin{to{transform:rotate(360deg)}}
-          .loading{color:rgba(255,255,255,.4);font-size:14px}
-          @media(max-width:480px){.card{padding:36px 24px}.key-value{font-size:18px;letter-spacing:2px}.info-grid{grid-template-columns:1fr}}
-          </style>
-          </head>
-          <body>
-          <div class="container">
-          <div class="card" id="content">
-          <div class="spinner"></div>
-          <p class="loading">Verifying access...</p>
-          </div>
-          </div>
-          <script>
-          PAGESTART
-
-          echo "var VALID_TOKEN='$TOKEN';" >> index.html
-          echo "var KEY='$KEY';" >> index.html
-
-          cat >> index.html << 'PAGEEND'
-          var hash=window.location.hash.substring(1);
-          var params=new URLSearchParams(hash);
-          var userToken=params.get('t');
-          if(!userToken){try{var s=localStorage.getItem('logichub_token');var st=parseInt(localStorage.getItem('logichub_token_time')||'0');if(s&&(Date.now()-st)<5400000){userToken=s;}}catch(e){}}
-          var c=document.getElementById('content');
-          if(!userToken){
-          c.innerHTML='<div class="logo logo-error">!</div><div class="title title-error">Access Denied</div><div class="subtitle">You must access this page through the Logic Hub script.</div><div class="error-box"><p>Get a fresh link by running the script and clicking "Copy Fresh Link" in the key prompt.</p></div><div class="footer">Tokens expire every hour. Bookmarking will not work.</div>';
-          }else if(userToken!==VALID_TOKEN){
-          c.innerHTML='<div class="logo logo-error">!</div><div class="title title-error">Token Expired</div><div class="subtitle">This link is no longer valid.</div><div class="error-box"><p>Tokens rotate every hour to prevent abuse. Run the Logic Hub script again to get a fresh link.</p></div><div class="footer">Each token is valid for approximately 1 hour.</div>';
-          }else{
-          c.innerHTML='<div class="logo">L</div><div class="title">Logic Hub</div><div class="subtitle"><span class="status-dot"></span>Active Key</div><div class="key-container" onclick="copyKey()"><div class="key-label">Your Access Key</div><div class="key-value">'+KEY+'</div></div><button class="copy-btn" id="copyBtn" onclick="copyKey()">Copy Key</button><div class="divider"></div><div class="info-grid"><div class="info-item"><div class="label">Refreshes</div><div class="value">Every 4 hours</div></div><div class="info-item"><div class="label">Status</div><div class="value">Valid</div></div></div><div class="footer">Paste this key in the Logic Hub script prompt to unlock.</div>';
-          }
-          function copyKey(){navigator.clipboard.writeText(KEY);var b=document.getElementById('copyBtn');b.textContent='Copied';b.classList.add('copied');setTimeout(function(){b.textContent='Copy Key';b.classList.remove('copied');},2000);}
-          </script>
-          </body>
-          </html>
-          PAGEEND
+          echo "Key: $KEY"
+          echo "Token: $TOKEN"
 
       - name: Commit public repo
         run: |
           rm -rf private
+          rm -f t9x3b7.dat.tmp
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add index.html d8f2a1.dat t9x3b7.dat
-          git commit -m "Update key page" || echo "No changes"
-          git push
+          git add d8f2a1.dat t9x3b7.dat
+          git diff --cached --quiet && echo "No file changes" || git commit -m "Sync key/token"
+          git push || true
