@@ -1,8 +1,9 @@
-name: Rotate Key Every 4 Hours
+name: Rotate Key & Token
 
 on:
   schedule:
-    - cron: '0 */4 * * *'
+    - cron: '0 * * * *'    # Every hour (token rotates)
+    - cron: '0 */4 * * *'  # Every 4 hours (key rotates)
   workflow_dispatch:
 
 permissions:
@@ -13,28 +14,53 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Generate new key
+        with:
+          fetch-depth: 0
+
+      - name: Determine if key should rotate
+        id: check
+        run: |
+          HOUR=$(date -u +"%H")
+          if [ $((10#$HOUR % 4)) -eq 0 ]; then
+            echo "rotate_key=true" >> $GITHUB_OUTPUT
+          else
+            echo "rotate_key=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Generate new key (every 4hrs)
+        if: steps.check.outputs.rotate_key == 'true'
         run: |
           PART1=$(openssl rand -hex 2 | tr 'a-f' 'A-F')
           PART2=$(openssl rand -hex 2 | tr 'a-f' 'A-F')
           PART3=$(openssl rand -hex 2 | tr 'a-f' 'A-F')
           NEW_KEY="LOGIC-${PART1}-${PART2}-${PART3}"
           echo "$NEW_KEY" > key.txt
-          echo "Generated: $NEW_KEY"
-          
-      - name: Update key page
+          echo "Generated key: $NEW_KEY"
+
+      - name: Generate new access token (every hour)
+        run: |
+          NEW_TOKEN=$(openssl rand -hex 8)
+          echo "$NEW_TOKEN" > token.txt
+          echo "Generated token: $NEW_TOKEN"
+
+      - name: Build key page (HTML with token validation)
         run: |
           KEY=$(cat key.txt)
+          TOKEN=$(cat token.txt)
           TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M UTC")
-          NEXT=$(date -u -d "+4 hours" +"%Y-%m-%d %H:%M UTC")
+          NEXT_TOKEN=$(date -u -d "+1 hour" +"%Y-%m-%d %H:%M UTC")
+          NEXT_KEY=$(date -u -d "+4 hours" +"%Y-%m-%d %H:%M UTC")
+          
           cat > index.html << EOF
           <!DOCTYPE html>
           <html>
           <head>
-            <title>Logic Hub | Key</title>
+            <title>Logic Hub | Key Access</title>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1">
+            <meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate">
+            <meta http-equiv="pragma" content="no-cache">
+            <meta http-equiv="expires" content="0">
             <style>
               body { font-family: 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #1a1a2e, #16213e); color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
               .box { background: rgba(255,255,255,0.05); padding: 40px; border-radius: 16px; text-align: center; border: 1px solid rgba(255,255,255,0.1); max-width: 500px; }
@@ -43,34 +69,78 @@ jobs:
               .info { color: #aaa; font-size: 14px; margin: 8px 0; }
               .copy-btn { background: #4ecdc4; color: #16213e; border: none; padding: 12px 24px; font-size: 16px; border-radius: 8px; cursor: pointer; margin-top: 10px; font-weight: bold; }
               .copy-btn:hover { background: #3db8af; }
+              .expired { background: #ff4757 !important; color: #fff !important; }
+              .warning { background: rgba(255, 71, 87, 0.1); border: 1px solid #ff4757; padding: 20px; border-radius: 8px; margin: 20px 0; }
+              .warning h2 { color: #ff4757; margin: 0 0 10px 0; }
+              .countdown { color: #4ecdc4; font-weight: bold; }
             </style>
           </head>
           <body>
-            <div class="box">
+            <div class="box" id="content">
               <h1>🔑 Logic Hub Key</h1>
-              <div class="info">Updated: $TIMESTAMP</div>
-              <div class="key" id="key" onclick="copyKey()">$KEY</div>
-              <button class="copy-btn" onclick="copyKey()">📋 Copy Key</button>
-              <div class="info">⏰ Next refresh: $NEXT</div>
-              <div class="info" style="margin-top: 20px; font-size: 12px;">
-                ⚠️ Keys rotate every 4 hours.<br>
-                Paste this in the Logic Hub key prompt.
-              </div>
+              <div id="status">Validating access...</div>
             </div>
+            
             <script>
+              const VALID_TOKEN = "$TOKEN";
+              const KEY = "$KEY";
+              const NEXT_TOKEN_TIME = "$NEXT_TOKEN";
+              const NEXT_KEY_TIME = "$NEXT_KEY";
+              const TIMESTAMP = "$TIMESTAMP";
+              
+              // Get token from URL
+              const params = new URLSearchParams(window.location.search);
+              const userToken = params.get('t');
+              
+              const content = document.getElementById('content');
+              
+              if (!userToken) {
+                content.innerHTML = \`
+                  <h1 style="color:#ff4757;">⚠️ Direct Access Blocked</h1>
+                  <div class="warning">
+                    <h2>🔒 Token Required</h2>
+                    <p>You must access this page through the official link in the script.</p>
+                    <p style="font-size:12px;color:#aaa;margin-top:15px;">Tokens expire every hour. Bookmarking won't work — get a fresh link from the Logic Hub script.</p>
+                  </div>
+                \`;
+              } else if (userToken !== VALID_TOKEN) {
+                content.innerHTML = \`
+                  <h1 style="color:#ff4757;">❌ Token Expired</h1>
+                  <div class="warning">
+                    <h2>⏰ This link has expired</h2>
+                    <p>Access tokens rotate every hour to prevent abuse.</p>
+                    <p>Run the Logic Hub script again to get a fresh link.</p>
+                    <p style="font-size:12px;color:#aaa;margin-top:15px;">Updated: \${TIMESTAMP}</p>
+                  </div>
+                \`;
+              } else {
+                content.innerHTML = \`
+                  <h1>🔑 Logic Hub Key</h1>
+                  <div class="info">✅ Token Valid | Generated: \${TIMESTAMP}</div>
+                  <div class="key" id="key" onclick="copyKey()">\${KEY}</div>
+                  <button class="copy-btn" onclick="copyKey()">📋 Copy Key</button>
+                  <div class="info">⏰ Token expires: <span class="countdown">\${NEXT_TOKEN_TIME}</span></div>
+                  <div class="info">🔄 Next key refresh: <span class="countdown">\${NEXT_KEY_TIME}</span></div>
+                  <div class="info" style="margin-top: 20px; font-size: 12px;">
+                    ⚠️ Keys rotate every 4 hours. Tokens rotate every hour.<br>
+                    Bookmarking won't work — always get fresh link from script.
+                  </div>
+                \`;
+              }
+              
               function copyKey() {
-                navigator.clipboard.writeText("$KEY");
+                navigator.clipboard.writeText(KEY);
                 alert("Key copied to clipboard!");
               }
             </script>
           </body>
           </html>
           EOF
-      
+
       - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add key.txt index.html
-          git commit -m "🔑 Rotate key" || echo "No changes"
+          git add key.txt token.txt index.html
+          git commit -m "🔄 Rotate token (key=$([ "${{ steps.check.outputs.rotate_key }}" = "true" ] && echo 'ROTATED' || echo 'unchanged'))" || echo "No changes"
           git push
