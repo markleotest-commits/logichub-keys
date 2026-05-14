@@ -27,15 +27,14 @@ jobs:
             echo "rotate_key=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Generate new key (every 4hrs)
-        if: steps.check.outputs.rotate_key == 'true'
-        run: |
-          PART1=$(openssl rand -hex 2 | tr 'a-f' 'A-F')
-          PART2=$(openssl rand -hex 2 | tr 'a-f' 'A-F')
-          PART3=$(openssl rand -hex 2 | tr 'a-f' 'A-F')
-          NEW_KEY="LOGIC-${PART1}-${PART2}-${PART3}"
-          echo "$NEW_KEY" > key.txt
-          echo "Generated key: $NEW_KEY"
+            - name: Generate new key (every 4hrs)
+            if: steps.check.outputs.rotate_key == 'true'
+            run: |
+                PART1=$(openssl rand -hex 2 | tr 'a-f' 'A-F')
+                PART2=$(openssl rand -hex 2 | tr 'a-f' 'A-F')
+                PART3=$(openssl rand -hex 2 | tr 'a-f' 'A-F')
+                NEW_KEY="LOGIC-${PART1}-${PART2}-${PART3}"
+                echo "$NEW_KEY" > key.txt
 
       - name: Generate new access token (every hour)
         run: |
