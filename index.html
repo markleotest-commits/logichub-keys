@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Logic Hub | Key</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #1a1a2e, #16213e); color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+    .box { background: rgba(255,255,255,0.05); padding: 40px; border-radius: 16px; text-align: center; border: 1px solid rgba(255,255,255,0.1); max-width: 500px; }
+    h1 { color: #4ecdc4; margin-bottom: 10px; }
+    .key { font-family: 'Courier New', monospace; font-size: 28px; background: #0f3460; padding: 20px; border-radius: 8px; margin: 20px 0; color: #4ecdc4; letter-spacing: 2px; user-select: all; cursor: pointer; }
+    .info { color: #aaa; font-size: 14px; margin: 8px 0; }
+    .copy-btn { background: #4ecdc4; color: #16213e; border: none; padding: 12px 24px; font-size: 16px; border-radius: 8px; cursor: pointer; margin-top: 10px; font-weight: bold; }
+    .copy-btn:hover { background: #3db8af; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>🔑 Logic Hub Key</h1>
+    <div class="info">Updated: 2026-05-14 14:11 UTC</div>
+    <div class="key" id="key" onclick="copyKey()">LOGIC-C62A-6B30-3D1E</div>
+    <button class="copy-btn" onclick="copyKey()">📋 Copy Key</button>
+    <div class="info">⏰ Next refresh: 2026-05-14 18:11 UTC</div>
+    <div class="info" style="margin-top: 20px; font-size: 12px;">
+      ⚠️ Keys rotate every 4 hours.<br>
+      Paste this in the Logic Hub key prompt.
+    </div>
+  </div>
+  <script>
+    function copyKey() {
+      navigator.clipboard.writeText("LOGIC-C62A-6B30-3D1E");
+      alert("Key copied to clipboard!");
+    }
+  </script>
+</body>
+</html>
