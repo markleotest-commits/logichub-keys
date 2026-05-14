@@ -4,205 +4,295 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Logic Hub | Verify</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23d4af37'/><text x='50' y='72' font-size='60' font-family='Arial' font-weight='bold' text-anchor='middle' fill='%230a0a0a'>L</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
+*{margin:0;padding:0;box-sizing:border-box}
 
-body {
-    font-family: 'Inter', sans-serif;
-    background: #0a0a0a;
-    color: #fff;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
+body{
+    font-family:'Inter',sans-serif;
+    background:#050505;
+    color:#fff;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    overflow-x:hidden;
 }
 
-body::before {
-    content: '';
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: radial-gradient(ellipse at 50% 0%, rgba(212, 175, 55, 0.08) 0%, transparent 60%);
-    pointer-events: none;
+canvas#particles{
+    position:fixed;
+    top:0;left:0;
+    width:100%;height:100%;
+    pointer-events:none;
+    z-index:0;
 }
 
-.container {
-    position: relative;
-    width: 100%;
-    max-width: 440px;
-    padding: 20px;
+body::before{
+    content:'';
+    position:fixed;
+    top:0;left:0;right:0;bottom:0;
+    background:
+        radial-gradient(ellipse at 50% -20%,rgba(212,175,55,.12) 0%,transparent 60%),
+        radial-gradient(ellipse at 80% 80%,rgba(212,175,55,.04) 0%,transparent 50%);
+    pointer-events:none;
+    z-index:1;
 }
 
-.card {
-    background: linear-gradient(145deg, rgba(20, 20, 20, 0.95), rgba(12, 12, 12, 0.98));
-    border: 1px solid rgba(212, 175, 55, 0.15);
-    border-radius: 16px;
-    padding: 48px 36px;
-    text-align: center;
-    backdrop-filter: blur(20px);
-    box-shadow: 0 0 60px rgba(0, 0, 0, 0.5), 0 0 120px rgba(212, 175, 55, 0.03);
-    animation: fadeIn 0.6s ease-out;
+.container{position:relative;width:100%;max-width:460px;padding:20px;z-index:2}
+
+.card{
+    background:linear-gradient(160deg,rgba(18,18,18,.97),rgba(8,8,8,.99));
+    border:1px solid rgba(212,175,55,.12);
+    border-radius:20px;
+    padding:44px 36px;
+    text-align:center;
+    backdrop-filter:blur(40px);
+    box-shadow:0 0 80px rgba(0,0,0,.6),0 0 160px rgba(212,175,55,.02),inset 0 1px 0 rgba(255,255,255,.03);
+    animation:cardIn .8s cubic-bezier(.16,1,.3,1);
+    position:relative;
+    overflow:hidden;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+.card::before{
+    content:'';
+    position:absolute;
+    top:-50%;left:-50%;
+    width:200%;height:200%;
+    background:conic-gradient(from 0deg,transparent,rgba(212,175,55,.03),transparent,rgba(212,175,55,.02),transparent);
+    animation:rotateBg 15s linear infinite;
+    z-index:0;
 }
 
-.logo {
-    width: 48px;
-    height: 48px;
-    margin: 0 auto 24px;
-    background: linear-gradient(135deg, #d4af37, #b8960c);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    box-shadow: 0 4px 20px rgba(212, 175, 55, 0.2);
+.card>*{position:relative;z-index:1}
+
+@keyframes cardIn{
+    from{opacity:0;transform:translateY(30px) scale(.96)}
+    to{opacity:1;transform:translateY(0) scale(1)}
 }
 
-.title {
-    font-size: 20px;
-    font-weight: 600;
-    color: #fff;
-    letter-spacing: 0.5px;
-    margin-bottom: 6px;
+@keyframes rotateBg{to{transform:rotate(360deg)}}
+
+.logo{
+    width:56px;height:56px;
+    margin:0 auto 20px;
+    background:linear-gradient(135deg,#d4af37 0%,#f0d060 50%,#b8960c 100%);
+    border-radius:14px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:26px;font-weight:700;color:#0a0a0a;
+    box-shadow:0 4px 24px rgba(212,175,55,.25),0 0 60px rgba(212,175,55,.08);
+    animation:logoPulse 3s ease-in-out infinite;
 }
 
-.subtitle {
-    font-size: 13px;
-    color: rgba(255, 255, 255, 0.35);
-    font-weight: 300;
-    margin-bottom: 32px;
-    line-height: 1.6;
+.logo-error{background:linear-gradient(135deg,#e74c3c,#c0392b);box-shadow:0 4px 24px rgba(231,76,60,.25)}
+
+@keyframes logoPulse{
+    0%,100%{box-shadow:0 4px 24px rgba(212,175,55,.25),0 0 60px rgba(212,175,55,.08)}
+    50%{box-shadow:0 4px 32px rgba(212,175,55,.35),0 0 80px rgba(212,175,55,.12)}
 }
 
-.continue-btn {
-    display: inline-block;
-    width: 100%;
-    padding: 16px;
-    background: linear-gradient(135deg, #d4af37, #b8960c);
-    color: #0a0a0a;
-    border: none;
-    border-radius: 10px;
-    font-family: 'Inter', sans-serif;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    letter-spacing: 0.5px;
-    text-decoration: none;
-    margin-bottom: 20px;
+.title{font-size:22px;font-weight:700;color:#fff;letter-spacing:.3px;margin-bottom:4px}
+.title-error{color:#e74c3c}
+
+.subtitle{
+    font-size:13px;color:rgba(255,255,255,.3);
+    font-weight:300;margin-bottom:32px;line-height:1.6;
 }
 
-.continue-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 30px rgba(212, 175, 55, 0.3);
+.steps{text-align:left;margin-bottom:28px}
+
+.step{
+    display:flex;align-items:flex-start;
+    gap:14px;margin-bottom:16px;
+    animation:stepIn .5s ease-out backwards;
 }
 
-.steps {
-    text-align: left;
-    margin-bottom: 28px;
+.step:nth-child(1){animation-delay:.2s}
+.step:nth-child(2){animation-delay:.35s}
+.step:nth-child(3){animation-delay:.5s}
+
+@keyframes stepIn{
+    from{opacity:0;transform:translateX(-10px)}
+    to{opacity:1;transform:translateX(0)}
 }
 
-.step {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    margin-bottom: 14px;
+.step-num{
+    width:28px;height:28px;min-width:28px;
+    background:linear-gradient(135deg,rgba(212,175,55,.15),rgba(212,175,55,.05));
+    border:1px solid rgba(212,175,55,.2);
+    border-radius:8px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:12px;color:#d4af37;font-weight:700;
 }
 
-.step-num {
-    width: 24px;
-    height: 24px;
-    min-width: 24px;
-    background: rgba(212, 175, 55, 0.1);
-    border: 1px solid rgba(212, 175, 55, 0.2);
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 11px;
-    color: #d4af37;
-    font-weight: 600;
+.step-text{
+    font-size:14px;color:rgba(255,255,255,.5);
+    line-height:1.5;padding-top:3px;
 }
 
-.step-text {
-    font-size: 13px;
-    color: rgba(255, 255, 255, 0.5);
-    line-height: 1.5;
-    padding-top: 2px;
+.step-text strong{color:rgba(255,255,255,.8);font-weight:500}
+
+.continue-btn{
+    display:block;width:100%;padding:16px;
+    background:linear-gradient(135deg,#d4af37 0%,#f0d060 50%,#b8960c 100%);
+    background-size:200% 200%;
+    animation:gradientShift 3s ease infinite;
+    color:#0a0a0a;border:none;border-radius:12px;
+    font-family:'Inter',sans-serif;font-size:15px;font-weight:700;
+    cursor:pointer;transition:all .3s ease;
+    letter-spacing:.8px;text-decoration:none;
+    margin-bottom:24px;text-align:center;
 }
 
-.warning {
-    font-size: 11px;
-    color: rgba(255, 255, 255, 0.2);
-    line-height: 1.5;
+@keyframes gradientShift{
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
 }
 
-.error-title {
-    font-size: 20px;
-    font-weight: 600;
-    color: #e74c3c;
-    margin-bottom: 8px;
+.continue-btn:hover{
+    transform:translateY(-2px);
+    box-shadow:0 6px 30px rgba(212,175,55,.35);
+}
+
+.security-badge{
+    display:inline-flex;align-items:center;gap:6px;
+    background:rgba(255,255,255,.03);
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:20px;padding:6px 14px;
+    margin-bottom:16px;
+}
+
+.lock-icon{font-size:12px}
+
+.security-text{
+    font-size:10px;color:rgba(255,255,255,.25);
+    letter-spacing:.5px;font-weight:400;
+}
+
+.warning{
+    font-size:11px;color:rgba(255,255,255,.15);
+    line-height:1.5;
+}
+
+.error-box{
+    background:rgba(231,76,60,.06);
+    border:1px solid rgba(231,76,60,.15);
+    border-radius:12px;padding:20px;margin-bottom:20px;
+}
+
+.error-box p{font-size:13px;color:rgba(255,255,255,.45);line-height:1.7}
+
+.version{
+    font-size:10px;color:rgba(255,255,255,.08);
+    margin-top:12px;font-family:'JetBrains Mono',monospace;
+}
+
+@media(max-width:480px){
+    .card{padding:36px 24px;border-radius:16px}
+    .logo{width:48px;height:48px;font-size:22px}
+    .step-text{font-size:13px}
 }
 </style>
 <script>
-var LOOTLABS_URL = "https://loot-link.com/s?Ad5mekmr";
+var LOOTLABS_URL="https://loot-link.com/s?Ad5mekmr";
+var params=new URLSearchParams(window.location.search);
+var hashParams=new URLSearchParams(window.location.hash.substring(1));
+var token=params.get('t')||hashParams.get('t');
 
-var params = new URLSearchParams(window.location.search);
-var hashParams = new URLSearchParams(window.location.hash.substring(1));
-var token = params.get('t') || hashParams.get('t');
-
-window.addEventListener('DOMContentLoaded', function() {
-    if (token) {
-        try {
-            localStorage.setItem('logichub_token', token);
-            localStorage.setItem('logichub_token_time', Date.now().toString());
-        } catch (e) {}
-        document.getElementById('start-link').href = LOOTLABS_URL;
-        document.getElementById('main-content').style.display = 'block';
-    } else {
-        document.getElementById('error-content').style.display = 'block';
+window.addEventListener('DOMContentLoaded',function(){
+    if(token){
+        try{
+            localStorage.setItem('logichub_token',token);
+            localStorage.setItem('logichub_token_time',Date.now().toString());
+        }catch(e){}
+        document.getElementById('start-link').href=LOOTLABS_URL;
+        document.getElementById('main-content').style.display='block';
+    }else{
+        document.getElementById('error-content').style.display='block';
     }
 });
 </script>
 </head>
 <body>
+<canvas id="particles"></canvas>
+
 <div class="container">
     <div class="card">
         <div id="main-content" style="display:none;">
             <div class="logo">L</div>
             <div class="title">Logic Hub</div>
-            <div class="subtitle">Complete a quick verification to get your access key.</div>
+            <div class="subtitle">Complete a quick verification to receive your access key.</div>
             
             <div class="steps">
                 <div class="step">
                     <div class="step-num">1</div>
-                    <div class="step-text">Click the button below</div>
+                    <div class="step-text"><strong>Click Continue</strong> below to start</div>
                 </div>
                 <div class="step">
                     <div class="step-num">2</div>
-                    <div class="step-text">Complete the short verification</div>
+                    <div class="step-text"><strong>Complete</strong> the short verification task</div>
                 </div>
                 <div class="step">
                     <div class="step-num">3</div>
-                    <div class="step-text">Copy your key and paste it in the script</div>
+                    <div class="step-text"><strong>Copy your key</strong> and paste it in the script</div>
                 </div>
             </div>
             
             <a id="start-link" href="#" class="continue-btn">Continue</a>
+            
+            <div class="security-badge">
+                <span class="lock-icon">&#128274;</span>
+                <span class="security-text">Secured with rotating tokens</span>
+            </div>
+            
             <div class="warning">Keys refresh every 4 hours. This link expires in 1 hour.</div>
+            <div class="version">Logic Hub v3.5</div>
         </div>
         
         <div id="error-content" style="display:none;">
-            <div class="logo" style="background:linear-gradient(135deg,#e74c3c,#c0392b);">!</div>
-            <div class="error-title">Access Denied</div>
-            <div class="subtitle">No valid token detected. Please get a fresh link from the Logic Hub script.</div>
+            <div class="logo logo-error">!</div>
+            <div class="title title-error">Access Denied</div>
+            <div class="subtitle">No valid token detected.</div>
+            <div class="error-box">
+                <p>Please get a fresh link from the Logic Hub script by clicking "Copy Fresh Link" in the key prompt.</p>
+            </div>
+            <div class="warning">Tokens expire every hour. Bookmarking will not work.</div>
+            <div class="version">Logic Hub v3.5</div>
         </div>
     </div>
 </div>
+
+<script>
+var canvas=document.getElementById('particles');
+var ctx=canvas.getContext('2d');
+var particles=[];
+
+function resizeCanvas(){canvas.width=window.innerWidth;canvas.height=window.innerHeight}
+resizeCanvas();
+window.addEventListener('resize',resizeCanvas);
+
+function createParticle(){
+    return{x:Math.random()*canvas.width,y:canvas.height+10,size:Math.random()*2+0.5,speedY:Math.random()*0.8+0.2,speedX:(Math.random()-0.5)*0.3,opacity:Math.random()*0.4+0.1,life:0,maxLife:Math.random()*400+200};
+}
+
+for(var i=0;i<40;i++){var p=createParticle();p.y=Math.random()*canvas.height;p.life=Math.random()*p.maxLife;particles.push(p)}
+
+function animateParticles(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach(function(p,idx){
+        p.y-=p.speedY;p.x+=p.speedX;p.life++;
+        var fadeRatio=1;
+        if(p.life>p.maxLife*0.7){fadeRatio=1-(p.life-p.maxLife*0.7)/(p.maxLife*0.3)}
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
+        ctx.fillStyle='rgba(212,175,55,'+(p.opacity*fadeRatio)+')';
+        ctx.fill();
+        if(p.life>=p.maxLife||p.y<-10){particles[idx]=createParticle()}
+    });
+    requestAnimationFrame(animateParticles);
+}
+animateParticles();
+</script>
 </body>
 </html>
