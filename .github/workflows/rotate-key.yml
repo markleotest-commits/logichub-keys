@@ -16,50 +16,39 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Determine if key should rotate
-        id: check
-        run: |
-          HOUR=$(date -u +"%H")
-          if [ $((10#$HOUR % 4)) -eq 0 ]; then
-            echo "rotate_key=true" >> $GITHUB_OUTPUT
-          else
-            echo "rotate_key=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Determine if key should rotate (based on file age)
-        id: check
+      - name: Check if key needs rotation
+        id: keycheck
         run: |
           if [ ! -f key.txt ]; then
             echo "rotate_key=true" >> $GITHUB_OUTPUT
-            echo "Reason: key.txt missing"
           else
-            # Get age of key.txt in seconds (since last commit)
             LAST_KEY_TIME=$(git log -1 --format=%ct -- key.txt 2>/dev/null || echo "0")
             CURRENT_TIME=$(date +%s)
             AGE_SECONDS=$((CURRENT_TIME - LAST_KEY_TIME))
             AGE_HOURS=$((AGE_SECONDS / 3600))
-            
             echo "Key age: $AGE_HOURS hours"
-            
-            # Rotate if older than 4 hours
             if [ $AGE_HOURS -ge 4 ]; then
               echo "rotate_key=true" >> $GITHUB_OUTPUT
-              echo "Reason: key is $AGE_HOURS hours old"
             else
               echo "rotate_key=false" >> $GITHUB_OUTPUT
-              echo "Reason: key only $AGE_HOURS hours old, not rotating yet"
             fi
           fi
 
-      - name: Generate new key (every 4hrs)
-        if: steps.check.outputs.rotate_key == 'true'
+      - name: Generate new key
+        if: steps.keycheck.outputs.rotate_key == 'true'
         run: |
           PART1=$(openssl rand -hex 2 | tr 'a-f' 'A-F')
           PART2=$(openssl rand -hex 2 | tr 'a-f' 'A-F')
           PART3=$(openssl rand -hex 2 | tr 'a-f' 'A-F')
           NEW_KEY="LOGIC-${PART1}-${PART2}-${PART3}"
           printf "%s" "$NEW_KEY" > key.txt
-          echo "Generated key: $NEW_KEY""
+          echo "Generated key: $NEW_KEY"
+
+      - name: Generate new token
+        run: |
+          NEW_TOKEN=$(openssl rand -hex 8)
+          printf "%s" "$NEW_TOKEN" > token.txt
+          echo "Generated token: $NEW_TOKEN"
 
       - name: Build key page
         run: |
@@ -68,91 +57,62 @@ jobs:
           TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M UTC")
           NEXT_TOKEN=$(date -u -d "+1 hour" +"%Y-%m-%d %H:%M UTC")
           NEXT_KEY=$(date -u -d "+4 hours" +"%Y-%m-%d %H:%M UTC")
-          
-          cat > index.html << EOF
+          cat > index.html << 'HTMLEOF'
           <!DOCTYPE html>
           <html>
           <head>
-            <title>Logic Hub | Key Access</title>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1">
-            <meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate">
-            <meta http-equiv="pragma" content="no-cache">
-            <meta http-equiv="expires" content="0">
-            <style>
-              body { font-family: 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #1a1a2e, #16213e); color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-              .box { background: rgba(255,255,255,0.05); padding: 40px; border-radius: 16px; text-align: center; border: 1px solid rgba(255,255,255,0.1); max-width: 500px; }
-              h1 { color: #4ecdc4; margin-bottom: 10px; }
-              .key { font-family: 'Courier New', monospace; font-size: 28px; background: #0f3460; padding: 20px; border-radius: 8px; margin: 20px 0; color: #4ecdc4; letter-spacing: 2px; user-select: all; cursor: pointer; }
-              .info { color: #aaa; font-size: 14px; margin: 8px 0; }
-              .copy-btn { background: #4ecdc4; color: #16213e; border: none; padding: 12px 24px; font-size: 16px; border-radius: 8px; cursor: pointer; margin-top: 10px; font-weight: bold; }
-              .copy-btn:hover { background: #3db8af; }
-              .warning { background: rgba(255, 71, 87, 0.1); border: 1px solid #ff4757; padding: 20px; border-radius: 8px; margin: 20px 0; }
-              .warning h2 { color: #ff4757; margin: 0 0 10px 0; }
-              .countdown { color: #4ecdc4; font-weight: bold; }
-            </style>
+          <title>Logic Hub | Key</title>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate">
+          <style>
+          body { font-family: 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #1a1a2e, #16213e); color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+          .box { background: rgba(255,255,255,0.05); padding: 40px; border-radius: 16px; text-align: center; border: 1px solid rgba(255,255,255,0.1); max-width: 500px; }
+          h1 { color: #4ecdc4; }
+          .key { font-family: 'Courier New', monospace; font-size: 28px; background: #0f3460; padding: 20px; border-radius: 8px; margin: 20px 0; color: #4ecdc4; letter-spacing: 2px; user-select: all; cursor: pointer; }
+          .info { color: #aaa; font-size: 14px; margin: 8px 0; }
+          .copy-btn { background: #4ecdc4; color: #16213e; border: none; padding: 12px 24px; font-size: 16px; border-radius: 8px; cursor: pointer; margin-top: 10px; font-weight: bold; }
+          .warning { background: rgba(255,71,87,0.1); border: 1px solid #ff4757; padding: 20px; border-radius: 8px; margin: 20px 0; }
+          .warning h2 { color: #ff4757; margin: 0 0 10px 0; }
+          </style>
           </head>
           <body>
-            <div class="box" id="content">
-              <h1>🔑 Logic Hub Key</h1>
-              <div id="status">Validating access...</div>
-            </div>
-            
-            <script>
-              const VALID_TOKEN = "$TOKEN";
-              const KEY = "$KEY";
-              const NEXT_TOKEN_TIME = "$NEXT_TOKEN";
-              const NEXT_KEY_TIME = "$NEXT_KEY";
-              const TIMESTAMP = "$TIMESTAMP";
-              
-              const hash = window.location.hash.substring(1);
-              const params = new URLSearchParams(hash);
-              const userToken = params.get('t');
-              
-              const content = document.getElementById('content');
-              
-              if (!userToken) {
-                content.innerHTML = \`
-                  <h1 style="color:#ff4757;">⚠️ Direct Access Blocked</h1>
-                  <div class="warning">
-                    <h2>🔒 Token Required</h2>
-                    <p>You must access this page through the official link in the script.</p>
-                    <p style="font-size:12px;color:#aaa;margin-top:15px;">Tokens expire every hour. Bookmarking won't work — get a fresh link from the Logic Hub script.</p>
-                  </div>
-                \`;
-              } else if (userToken !== VALID_TOKEN) {
-                content.innerHTML = \`
-                  <h1 style="color:#ff4757;">❌ Token Expired</h1>
-                  <div class="warning">
-                    <h2>⏰ This link has expired</h2>
-                    <p>Access tokens rotate every hour to prevent abuse.</p>
-                    <p>Run the Logic Hub script again to get a fresh link.</p>
-                    <p style="font-size:12px;color:#aaa;margin-top:15px;">Updated: \${TIMESTAMP}</p>
-                  </div>
-                \`;
-              } else {
-                content.innerHTML = \`
-                  <h1>🔑 Logic Hub Key</h1>
-                  <div class="info">✅ Token Valid | Generated: \${TIMESTAMP}</div>
-                  <div class="key" id="key" onclick="copyKey()">\${KEY}</div>
-                  <button class="copy-btn" onclick="copyKey()">📋 Copy Key</button>
-                  <div class="info">⏰ Token expires: <span class="countdown">\${NEXT_TOKEN_TIME}</span></div>
-                  <div class="info">🔄 Next key refresh: <span class="countdown">\${NEXT_KEY_TIME}</span></div>
-                  <div class="info" style="margin-top: 20px; font-size: 12px;">
-                    ⚠️ Keys rotate every 4 hours. Tokens rotate every hour.<br>
-                    Bookmarking won't work — always get fresh link from script.
-                  </div>
-                \`;
-              }
-              
-              function copyKey() {
-                navigator.clipboard.writeText(KEY);
-                alert("Key copied to clipboard!");
-              }
-            </script>
+          <div class="box" id="content">
+          <h1>Loading...</h1>
+          </div>
+          <script>
+          HTMLEOF
+          
+          cat >> index.html << JSEOF
+          var VALID_TOKEN = "$TOKEN";
+          var KEY = "$KEY";
+          var TIMESTAMP = "$TIMESTAMP";
+          var NEXT_TOKEN_TIME = "$NEXT_TOKEN";
+          var NEXT_KEY_TIME = "$NEXT_KEY";
+          JSEOF
+          
+          cat >> index.html << 'HTMLEOF2'
+          var hash = window.location.hash.substring(1);
+          var params = new URLSearchParams(hash);
+          var userToken = params.get('t');
+          var content = document.getElementById('content');
+          
+          if (!userToken) {
+            content.innerHTML = '<h1 style="color:#ff4757;">⚠️ Direct Access Blocked</h1><div class="warning"><h2>🔒 Token Required</h2><p>You must access this page through the official link in the script.</p><p style="font-size:12px;color:#aaa;margin-top:15px;">Tokens expire every hour. Bookmarking won\'t work.</p></div>';
+          } else if (userToken !== VALID_TOKEN) {
+            content.innerHTML = '<h1 style="color:#ff4757;">❌ Token Expired</h1><div class="warning"><h2>⏰ This link has expired</h2><p>Tokens rotate every hour.</p><p>Run the Logic Hub script again for a fresh link.</p></div>';
+          } else {
+            content.innerHTML = '<h1>🔑 Logic Hub Key</h1><div class="info">✅ Valid | ' + TIMESTAMP + '</div><div class="key" onclick="copyKey()">' + KEY + '</div><button class="copy-btn" onclick="copyKey()">📋 Copy Key</button><div class="info">⏰ Token expires: ' + NEXT_TOKEN_TIME + '</div><div class="info">🔄 Key refresh: ' + NEXT_KEY_TIME + '</div><div class="info" style="margin-top:20px;font-size:12px;">Keys rotate every 4 hours. Tokens rotate every hour.</div>';
+          }
+          
+          function copyKey() {
+            navigator.clipboard.writeText(KEY);
+            alert("Key copied!");
+          }
+          </script>
           </body>
           </html>
-          EOF
+          HTMLEOF2
 
       - name: Commit and push
         run: |
