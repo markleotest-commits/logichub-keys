@@ -16,13 +16,17 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Clone private repo
+        run: |
+          git clone https://x-access-token:${{ secrets.PRIVATE_REPO_TOKEN }}@github.com/markleotest-commits/logichub-private.git private
+
       - name: Check if key needs rotation
         id: keycheck
         run: |
-          if [ ! -f key.txt ]; then
+          if [ ! -f private/key.txt ]; then
             echo "rotate_key=true" >> $GITHUB_OUTPUT
           else
-            LAST_KEY_TIME=$(git log -1 --format=%ct -- key.txt 2>/dev/null || echo "0")
+            LAST_KEY_TIME=$(cd private && git log -1 --format=%ct -- key.txt 2>/dev/null || echo "0")
             CURRENT_TIME=$(date +%s)
             AGE_SECONDS=$((CURRENT_TIME - LAST_KEY_TIME))
             AGE_HOURS=$((AGE_SECONDS / 3600))
@@ -41,22 +45,28 @@ jobs:
           PART2=$(openssl rand -hex 2 | tr 'a-f' 'A-F')
           PART3=$(openssl rand -hex 2 | tr 'a-f' 'A-F')
           NEW_KEY="LOGIC-${PART1}-${PART2}-${PART3}"
-          printf "%s" "$NEW_KEY" > key.txt
+          printf "%s" "$NEW_KEY" > private/key.txt
           echo "Generated key: $NEW_KEY"
 
       - name: Generate new token
         run: |
           NEW_TOKEN=$(openssl rand -hex 8)
-          printf "%s" "$NEW_TOKEN" > token.txt
+          printf "%s" "$NEW_TOKEN" > private/token.txt
           echo "Generated token: $NEW_TOKEN"
 
-      - name: Build key page
+      - name: Push to private repo
         run: |
-          KEY=$(cat key.txt)
-          TOKEN=$(cat token.txt)
-          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M UTC")
-          NEXT_TOKEN=$(date -u -d "+1 hour" +"%Y-%m-%d %H:%M UTC")
-          NEXT_KEY=$(date -u -d "+4 hours" +"%Y-%m-%d %H:%M UTC")
+          cd private
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add key.txt token.txt
+          git commit -m "Rotate key/token" || echo "No changes"
+          git push
+          cd ..
+
+      - name: Build key page for public repo
+        run: |
+          KEY=$(cat private/key.txt)
           cat > index.html << 'HTMLEOF'
           <!DOCTYPE html>
           <html>
@@ -72,52 +82,40 @@ jobs:
           .key { font-family: 'Courier New', monospace; font-size: 28px; background: #0f3460; padding: 20px; border-radius: 8px; margin: 20px 0; color: #4ecdc4; letter-spacing: 2px; user-select: all; cursor: pointer; }
           .info { color: #aaa; font-size: 14px; margin: 8px 0; }
           .copy-btn { background: #4ecdc4; color: #16213e; border: none; padding: 12px 24px; font-size: 16px; border-radius: 8px; cursor: pointer; margin-top: 10px; font-weight: bold; }
-          .warning { background: rgba(255,71,87,0.1); border: 1px solid #ff4757; padding: 20px; border-radius: 8px; margin: 20px 0; }
-          .warning h2 { color: #ff4757; margin: 0 0 10px 0; }
           </style>
           </head>
           <body>
           <div class="box" id="content">
-          <h1>Loading...</h1>
+          <h1>Logic Hub Key</h1>
+          <p class="info">Loading...</p>
           </div>
           <script>
           HTMLEOF
-          
-          cat >> index.html << JSEOF
-          var VALID_TOKEN = "$TOKEN";
-          var KEY = "$KEY";
-          var TIMESTAMP = "$TIMESTAMP";
-          var NEXT_TOKEN_TIME = "$NEXT_TOKEN";
-          var NEXT_KEY_TIME = "$NEXT_KEY";
-          JSEOF
-          
+
+          echo "var KEY = \"$KEY\";" >> index.html
+
           cat >> index.html << 'HTMLEOF2'
-          var hash = window.location.hash.substring(1);
-          var params = new URLSearchParams(hash);
-          var userToken = params.get('t');
-          var content = document.getElementById('content');
-          
-          if (!userToken) {
-            content.innerHTML = '<h1 style="color:#ff4757;">⚠️ Direct Access Blocked</h1><div class="warning"><h2>🔒 Token Required</h2><p>You must access this page through the official link in the script.</p><p style="font-size:12px;color:#aaa;margin-top:15px;">Tokens expire every hour. Bookmarking won\'t work.</p></div>';
-          } else if (userToken !== VALID_TOKEN) {
-            content.innerHTML = '<h1 style="color:#ff4757;">❌ Token Expired</h1><div class="warning"><h2>⏰ This link has expired</h2><p>Tokens rotate every hour.</p><p>Run the Logic Hub script again for a fresh link.</p></div>';
-          } else {
-            content.innerHTML = '<h1>🔑 Logic Hub Key</h1><div class="info">✅ Valid | ' + TIMESTAMP + '</div><div class="key" onclick="copyKey()">' + KEY + '</div><button class="copy-btn" onclick="copyKey()">📋 Copy Key</button><div class="info">⏰ Token expires: ' + NEXT_TOKEN_TIME + '</div><div class="info">🔄 Key refresh: ' + NEXT_KEY_TIME + '</div><div class="info" style="margin-top:20px;font-size:12px;">Keys rotate every 4 hours. Tokens rotate every hour.</div>';
-          }
-          
+          document.getElementById('content').innerHTML =
+            '<h1>Logic Hub Key</h1>' +
+            '<div class="info">Key refreshes every 4 hours</div>' +
+            '<div class="key" onclick="copyKey()">' + KEY + '</div>' +
+            '<button class="copy-btn" onclick="copyKey()">Copy Key</button>' +
+            '<div class="info" style="margin-top:20px;font-size:12px;">Paste this key in the Logic Hub script.</div>';
+
           function copyKey() {
             navigator.clipboard.writeText(KEY);
-            alert("Key copied!");
+            alert('Key copied!');
           }
           </script>
           </body>
           </html>
           HTMLEOF2
 
-      - name: Commit and push
+      - name: Commit public repo
         run: |
+          rm -rf private
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add key.txt token.txt index.html
-          git commit -m "🔄 Rotate token/key" || echo "No changes"
+          git add index.html
+          git commit -m "Update key page" || echo "No changes"
           git push
