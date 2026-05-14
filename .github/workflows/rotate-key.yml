@@ -88,8 +88,10 @@ jobs:
               const NEXT_KEY_TIME = "$NEXT_KEY";
               const TIMESTAMP = "$TIMESTAMP";
               
-              // Get token from URL
-              const params = new URLSearchParams(window.location.search);
+              // Get token from URL fragment (#t=...)
+              // Fragments survive ALL redirects (Linkvertise can't strip them)
+              const hash = window.location.hash.substring(1); // remove the #
+              const params = new URLSearchParams(hash);
               const userToken = params.get('t');
               
               const content = document.getElementById('content');
