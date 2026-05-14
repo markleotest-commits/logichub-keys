@@ -29,12 +29,7 @@ body::before {
     pointer-events: none;
 }
 
-.container {
-    position: relative;
-    width: 100%;
-    max-width: 440px;
-    padding: 20px;
-}
+.container { position: relative; width: 100%; max-width: 440px; padding: 20px; }
 
 .card {
     background: linear-gradient(145deg, rgba(20, 20, 20, 0.95), rgba(12, 12, 12, 0.98));
@@ -53,43 +48,31 @@ body::before {
 }
 
 .logo {
-    width: 48px;
-    height: 48px;
-    margin: 0 auto 24px;
+    width: 48px; height: 48px; margin: 0 auto 24px;
     background: linear-gradient(135deg, #d4af37, #b8960c);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
+    border-radius: 12px; display: flex; align-items: center; justify-content: center;
+    font-size: 24px; font-weight: 600; color: #0a0a0a;
     box-shadow: 0 4px 20px rgba(212, 175, 55, 0.2);
 }
 
-.title {
-    font-size: 20px;
-    font-weight: 600;
-    color: #fff;
-    letter-spacing: 0.5px;
-    margin-bottom: 6px;
+.logo-error {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
 }
 
+.title { font-size: 20px; font-weight: 600; color: #fff; letter-spacing: 0.5px; margin-bottom: 6px; }
+.title-error { color: #e74c3c; }
+
 .subtitle {
-    font-size: 13px;
-    color: rgba(255, 255, 255, 0.35);
-    font-weight: 300;
-    margin-bottom: 32px;
+    font-size: 13px; color: rgba(255, 255, 255, 0.35);
+    font-weight: 300; margin-bottom: 32px; line-height: 1.6;
 }
 
 .key-container {
     background: rgba(212, 175, 55, 0.06);
     border: 1px solid rgba(212, 175, 55, 0.12);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 24px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
+    border-radius: 12px; padding: 20px; margin-bottom: 24px;
+    cursor: pointer; transition: all 0.3s ease;
+    position: relative; overflow: hidden;
 }
 
 .key-container:hover {
@@ -97,142 +80,73 @@ body::before {
     background: rgba(212, 175, 55, 0.1);
 }
 
-.key-container::after {
-    content: '';
-    position: absolute;
-    top: 0; left: -100%;
-    width: 100%; height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.05), transparent);
-    transition: left 0.5s ease;
-}
-
-.key-container:hover::after {
-    left: 100%;
-}
-
 .key-label {
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    color: rgba(212, 175, 55, 0.6);
-    margin-bottom: 12px;
-    font-weight: 500;
+    font-size: 10px; text-transform: uppercase; letter-spacing: 2px;
+    color: rgba(212, 175, 55, 0.6); margin-bottom: 12px; font-weight: 500;
 }
 
 .key-value {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 22px;
-    color: #d4af37;
-    letter-spacing: 3px;
-    font-weight: 500;
-    user-select: all;
-    word-break: break-all;
+    font-family: 'JetBrains Mono', monospace; font-size: 22px;
+    color: #d4af37; letter-spacing: 3px; font-weight: 500;
+    user-select: all; word-break: break-all;
 }
 
 .copy-btn {
-    width: 100%;
-    padding: 14px;
+    width: 100%; padding: 14px;
     background: linear-gradient(135deg, #d4af37, #b8960c);
-    color: #0a0a0a;
-    border: none;
-    border-radius: 10px;
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    letter-spacing: 0.5px;
-    margin-bottom: 24px;
+    color: #0a0a0a; border: none; border-radius: 10px;
+    font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: all 0.3s ease;
+    letter-spacing: 0.5px; margin-bottom: 24px;
 }
 
-.copy-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 20px rgba(212, 175, 55, 0.3);
-}
+.copy-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(212, 175, 55, 0.3); }
+.copy-btn.copied { background: linear-gradient(135deg, #2ecc71, #27ae60); }
 
-.copy-btn:active {
-    transform: translateY(0);
-}
-
-.copy-btn.copied {
-    background: linear-gradient(135deg, #2ecc71, #27ae60);
-}
-
-.info-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 20px;
-}
+.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
 
 .info-item {
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 8px;
-    padding: 12px;
-    text-align: left;
+    border-radius: 8px; padding: 12px; text-align: left;
 }
 
 .info-item .label {
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: rgba(255, 255, 255, 0.3);
-    margin-bottom: 4px;
+    font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px;
+    color: rgba(255, 255, 255, 0.3); margin-bottom: 4px;
 }
 
-.info-item .value {
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.7);
-    font-weight: 400;
-}
+.info-item .value { font-size: 12px; color: rgba(255, 255, 255, 0.7); }
 
-.footer {
-    font-size: 11px;
-    color: rgba(255, 255, 255, 0.2);
-    line-height: 1.6;
-}
-
-.divider {
-    width: 40px;
-    height: 1px;
-    background: rgba(212, 175, 55, 0.2);
-    margin: 0 auto 20px;
-}
+.footer { font-size: 11px; color: rgba(255, 255, 255, 0.2); line-height: 1.6; }
+.divider { width: 40px; height: 1px; background: rgba(212, 175, 55, 0.2); margin: 0 auto 20px; }
 
 .status-dot {
-    display: inline-block;
-    width: 6px;
-    height: 6px;
-    background: #2ecc71;
-    border-radius: 50%;
-    margin-right: 6px;
+    display: inline-block; width: 6px; height: 6px;
+    background: #2ecc71; border-radius: 50%; margin-right: 6px;
     animation: pulse 2s infinite;
 }
 
-@keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-}
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-.loading {
-    color: rgba(255, 255, 255, 0.4);
-    font-size: 14px;
-}
-
-.loading-spinner {
-    width: 24px;
-    height: 24px;
+.spinner {
+    width: 24px; height: 24px;
     border: 2px solid rgba(212, 175, 55, 0.1);
-    border-top-color: #d4af37;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    margin: 0 auto 16px;
+    border-top-color: #d4af37; border-radius: 50%;
+    animation: spin 0.8s linear infinite; margin: 0 auto 16px;
 }
 
-@keyframes spin {
-    to { transform: rotate(360deg); }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading { color: rgba(255, 255, 255, 0.4); font-size: 14px; }
+
+.error-box {
+    background: rgba(231, 76, 60, 0.08);
+    border: 1px solid rgba(231, 76, 60, 0.2);
+    border-radius: 10px; padding: 20px; margin-bottom: 20px;
 }
+
+.error-box p { font-size: 13px; color: rgba(255, 255, 255, 0.5); line-height: 1.6; }
 
 @media (max-width: 480px) {
     .card { padding: 36px 24px; }
@@ -244,50 +158,89 @@ body::before {
 <body>
 <div class="container">
     <div class="card" id="content">
-        <div class="loading-spinner"></div>
-        <p class="loading">Retrieving key...</p>
+        <div class="spinner"></div>
+        <p class="loading">Verifying access...</p>
     </div>
 </div>
 
 <script>
-fetch('https://raw.githubusercontent.com/markleotest-commits/logichub-keys/main/d8f2a1.dat?nocache=' + Date.now())
-    .then(function(r) { return r.text(); })
-    .then(function(key) {
-        key = key.trim();
-        var now = new Date();
-        var timeStr = now.toUTCString();
-        
-        document.getElementById('content').innerHTML =
-            '<div class="logo">L</div>' +
-            '<div class="title">Logic Hub</div>' +
-            '<div class="subtitle"><span class="status-dot"></span>Active Key</div>' +
-            '<div class="key-container" onclick="copyKey()">' +
-                '<div class="key-label">Your Access Key</div>' +
-                '<div class="key-value">' + key + '</div>' +
-            '</div>' +
-            '<button class="copy-btn" id="copyBtn" onclick="copyKey()">Copy Key</button>' +
-            '<div class="divider"></div>' +
-            '<div class="info-grid">' +
-                '<div class="info-item">' +
-                    '<div class="label">Refreshes</div>' +
-                    '<div class="value">Every 4 hours</div>' +
-                '</div>' +
-                '<div class="info-item">' +
-                    '<div class="label">Status</div>' +
-                    '<div class="value">Valid</div>' +
-                '</div>' +
-            '</div>' +
-            '<div class="footer">Paste this key in the Logic Hub script prompt to unlock.</div>';
+// Get token from URL fragment or localStorage
+var hash = window.location.hash.substring(1);
+var params = new URLSearchParams(hash);
+var userToken = params.get('t');
 
-        window.currentKey = key;
-    })
-    .catch(function() {
-        document.getElementById('content').innerHTML =
-            '<div class="logo" style="background:linear-gradient(135deg,#e74c3c,#c0392b);">!</div>' +
-            '<div class="title">Error</div>' +
-            '<div class="subtitle">Could not retrieve key</div>' +
-            '<div class="footer">Try refreshing the page.</div>';
-    });
+// Also check localStorage as fallback
+if (!userToken) {
+    try {
+        var stored = localStorage.getItem('logichub_token');
+        var storedTime = parseInt(localStorage.getItem('logichub_token_time') || '0');
+        if (stored && (Date.now() - storedTime) < 5400000) {
+            userToken = stored;
+        }
+    } catch(e) {}
+}
+
+var content = document.getElementById('content');
+
+if (!userToken) {
+    // No token at all
+    content.innerHTML =
+        '<div class="logo logo-error">!</div>' +
+        '<div class="title title-error">Access Denied</div>' +
+        '<div class="subtitle">You must access this page through the Logic Hub script.</div>' +
+        '<div class="error-box"><p>Get a fresh link by running the script and clicking "Copy Fresh Link" in the key prompt.</p></div>' +
+        '<div class="footer">Tokens expire every hour. Bookmarking will not work.</div>';
+} else {
+    // Has token — verify against live token from GitHub
+    fetch('https://raw.githubusercontent.com/markleotest-commits/logichub-keys/main/t9x3b7.dat?nocache=' + Date.now())
+        .then(function(r) { return r.text(); })
+        .then(function(liveToken) {
+            liveToken = liveToken.trim();
+            
+            if (userToken === liveToken) {
+                // Token valid — show key
+                return fetch('https://raw.githubusercontent.com/markleotest-commits/logichub-keys/main/d8f2a1.dat?nocache=' + Date.now());
+            } else {
+                throw new Error('expired');
+            }
+        })
+        .then(function(r) { return r.text(); })
+        .then(function(key) {
+            key = key.trim();
+            window.currentKey = key;
+            
+            content.innerHTML =
+                '<div class="logo">L</div>' +
+                '<div class="title">Logic Hub</div>' +
+                '<div class="subtitle"><span class="status-dot"></span>Active Key</div>' +
+                '<div class="key-container" onclick="copyKey()">' +
+                    '<div class="key-label">Your Access Key</div>' +
+                    '<div class="key-value">' + key + '</div>' +
+                '</div>' +
+                '<button class="copy-btn" id="copyBtn" onclick="copyKey()">Copy Key</button>' +
+                '<div class="divider"></div>' +
+                '<div class="info-grid">' +
+                    '<div class="info-item"><div class="label">Refreshes</div><div class="value">Every 4 hours</div></div>' +
+                    '<div class="info-item"><div class="label">Status</div><div class="value">Valid</div></div>' +
+                '</div>' +
+                '<div class="footer">Paste this key in the Logic Hub script prompt to unlock.</div>';
+        })
+        .catch(function(err) {
+            if (err.message === 'expired') {
+                content.innerHTML =
+                    '<div class="logo logo-error">!</div>' +
+                    '<div class="title title-error">Token Expired</div>' +
+                    '<div class="subtitle">This link is no longer valid.</div>' +
+                    '<div class="error-box"><p>Tokens rotate every hour to prevent abuse. Run the Logic Hub script again to get a fresh link.</p></div>' +
+                    '<div class="footer">Each token is valid for approximately 1 hour.</div>';
+            } else {
+                content.innerHTML =
+                    '<div class="logo logo-error">!</div>' +
+                    '<div class="title title-error">Error</div>' +
+                    '<div class="subtitle">Could not verify access. Try refreshing.</div>';
+            }
+        });
+}
 
 function copyKey() {
     if (window.currentKey) {
