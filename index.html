@@ -12,40 +12,24 @@ h1 { color: #4ecdc4; }
 .key { font-family: 'Courier New', monospace; font-size: 28px; background: #0f3460; padding: 20px; border-radius: 8px; margin: 20px 0; color: #4ecdc4; letter-spacing: 2px; user-select: all; cursor: pointer; }
 .info { color: #aaa; font-size: 14px; margin: 8px 0; }
 .copy-btn { background: #4ecdc4; color: #16213e; border: none; padding: 12px 24px; font-size: 16px; border-radius: 8px; cursor: pointer; margin-top: 10px; font-weight: bold; }
-.copy-btn:hover { background: #3db8af; }
-.loading { color: #4ecdc4; }
 </style>
 </head>
 <body>
 <div class="box" id="content">
-<h1>🔑 Logic Hub Key</h1>
-<p class="loading">Loading key...</p>
+<h1>Logic Hub Key</h1>
+<p class="info">Loading...</p>
 </div>
 <script>
-// Fetch key directly from GitHub raw file (always fresh)
-fetch('https://raw.githubusercontent.com/markleotest-commits/logichub-keys/main/key.txt?nocache=' + Date.now())
-  .then(function(r) { return r.text(); })
-  .then(function(key) {
-    key = key.trim();
-    document.getElementById('content').innerHTML = 
-      '<h1>🔑 Logic Hub Key</h1>' +
-      '<div class="info">Key refreshes every 4 hours</div>' +
-      '<div class="key" onclick="copyKey()">' + key + '</div>' +
-      '<button class="copy-btn" onclick="copyKey()">📋 Copy Key</button>' +
-      '<div class="info" style="margin-top:20px;font-size:12px;">Paste this key in the Logic Hub script prompt.</div>';
-    
-    window.currentKey = key;
-  })
-  .catch(function() {
-    document.getElementById('content').innerHTML = 
-      '<h1 style="color:#ff4757;">❌ Error</h1><p>Could not load key. Try refreshing.</p>';
-  });
-
+var KEY = "LOGIC-B221-DBA6-A0A6";
+document.getElementById('content').innerHTML =
+  '<h1>Logic Hub Key</h1>' +
+  '<div class="info">Key refreshes every 4 hours</div>' +
+  '<div class="key" onclick="copyKey()">' + KEY + '</div>' +
+  '<button class="copy-btn" onclick="copyKey()">Copy Key</button>' +
+  '<div class="info" style="margin-top:20px;font-size:12px;">Paste this key in the Logic Hub script.</div>';
 function copyKey() {
-  if (window.currentKey) {
-    navigator.clipboard.writeText(window.currentKey);
-    alert('Key copied!');
-  }
+  navigator.clipboard.writeText(KEY);
+  alert('Key copied!');
 }
 </script>
 </body>
