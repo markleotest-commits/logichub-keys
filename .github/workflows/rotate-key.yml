@@ -37,10 +37,10 @@ jobs:
                 echo "$NEW_KEY" > key.txt
 
       - name: Generate new access token (every hour)
-        run: |
-          NEW_TOKEN=$(openssl rand -hex 8)
-          echo "$NEW_TOKEN" > token.txt
-          echo "Generated token: $NEW_TOKEN"
+            run: |
+              NEW_TOKEN=$(openssl rand -hex 8)
+                printf "%s" "$NEW_TOKEN" > token.txt
+                echo "Generated token: $NEW_TOKEN"
 
       - name: Build key page (HTML with token validation)
         run: |
