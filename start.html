@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Logic Hub | Get Key</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body { 
+    font-family: 'Segoe UI', Arial, sans-serif; 
+    background: linear-gradient(135deg, #1a1a2e, #16213e); 
+    color: #fff; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    min-height: 100vh; 
+    margin: 0;
+}
+.box { 
+    background: rgba(255,255,255,0.05); 
+    padding: 40px; 
+    border-radius: 16px; 
+    text-align: center; 
+    border: 1px solid rgba(255,255,255,0.1); 
+    max-width: 500px;
+}
+h1 { color: #4ecdc4; margin-bottom: 10px; }
+.btn { 
+    display: inline-block;
+    background: #4ecdc4; 
+    color: #16213e; 
+    border: none; 
+    padding: 16px 32px; 
+    font-size: 18px; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    margin-top: 20px; 
+    font-weight: bold;
+    text-decoration: none;
+}
+.btn:hover { background: #3db8af; }
+.info { color: #aaa; font-size: 14px; margin: 8px 0; }
+.warning { color: #ff4757; font-size: 13px; margin-top: 20px; }
+</style>
+<script>
+const params = new URLSearchParams(window.location.search);
+const hashParams = new URLSearchParams(window.location.hash.substring(1));
+const token = params.get('t') || hashParams.get('t');
+
+// The Workink URL — change this if you ever switch shorteners
+const WORKINK_URL = "https://work.ink/1TkK/logic-hub-key";
+
+window.addEventListener('DOMContentLoaded', function() {
+    if (token) {
+        // Save token to localStorage with timestamp
+        try {
+            localStorage.setItem('logichub_token', token);
+            localStorage.setItem('logichub_token_time', Date.now().toString());
+        } catch (e) {}
+        
+        document.getElementById('start-link').href = WORKINK_URL;
+        document.getElementById('content').style.display = 'block';
+    } else {
+        document.getElementById('content').innerHTML = '<h1 style="color:#ff4757;">❌ No Token</h1><p>Get a fresh link from the Logic Hub script.</p>';
+    }
+});
+</script>
+</head>
+<body>
+<div class="box" id="content" style="display:none;">
+    <h1>🔑 Logic Hub Key</h1>
+    <p>Click below to start the verification process.</p>
+    <p class="info">Complete a quick task to get your key.</p>
+    <a id="start-link" href="#" class="btn">▶️ Continue to Verification</a>
+    <p class="warning">⚠️ Don't bookmark this page — tokens expire every hour.</p>
+</div>
+</body>
+</html>
