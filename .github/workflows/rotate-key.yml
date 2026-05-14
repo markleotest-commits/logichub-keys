@@ -2,8 +2,7 @@ name: Rotate Key & Token
 
 on:
   schedule:
-    - cron: '0 * * * *'    # Every hour (token rotates)
-    - cron: '0 */4 * * *'  # Every 4 hours (key rotates)
+    - cron: '0 * * * *'
   workflow_dispatch:
 
 permissions:
@@ -27,22 +26,23 @@ jobs:
             echo "rotate_key=false" >> $GITHUB_OUTPUT
           fi
 
-            - name: Generate new key (every 4hrs)
-            if: steps.check.outputs.rotate_key == 'true'
-            run: |
-                PART1=$(openssl rand -hex 2 | tr 'a-f' 'A-F')
-                PART2=$(openssl rand -hex 2 | tr 'a-f' 'A-F')
-                PART3=$(openssl rand -hex 2 | tr 'a-f' 'A-F')
-                NEW_KEY="LOGIC-${PART1}-${PART2}-${PART3}"
-                echo "$NEW_KEY" > key.txt
+      - name: Generate new key (every 4hrs)
+        if: steps.check.outputs.rotate_key == 'true'
+        run: |
+          PART1=$(openssl rand -hex 2 | tr 'a-f' 'A-F')
+          PART2=$(openssl rand -hex 2 | tr 'a-f' 'A-F')
+          PART3=$(openssl rand -hex 2 | tr 'a-f' 'A-F')
+          NEW_KEY="LOGIC-${PART1}-${PART2}-${PART3}"
+          printf "%s" "$NEW_KEY" > key.txt
+          echo "Generated key: $NEW_KEY"
 
       - name: Generate new access token (every hour)
-            run: |
-              NEW_TOKEN=$(openssl rand -hex 8)
-                printf "%s" "$NEW_TOKEN" > token.txt
-                echo "Generated token: $NEW_TOKEN"
+        run: |
+          NEW_TOKEN=$(openssl rand -hex 8)
+          printf "%s" "$NEW_TOKEN" > token.txt
+          echo "Generated token: $NEW_TOKEN"
 
-      - name: Build key page (HTML with token validation)
+      - name: Build key page
         run: |
           KEY=$(cat key.txt)
           TOKEN=$(cat token.txt)
@@ -68,7 +68,6 @@ jobs:
               .info { color: #aaa; font-size: 14px; margin: 8px 0; }
               .copy-btn { background: #4ecdc4; color: #16213e; border: none; padding: 12px 24px; font-size: 16px; border-radius: 8px; cursor: pointer; margin-top: 10px; font-weight: bold; }
               .copy-btn:hover { background: #3db8af; }
-              .expired { background: #ff4757 !important; color: #fff !important; }
               .warning { background: rgba(255, 71, 87, 0.1); border: 1px solid #ff4757; padding: 20px; border-radius: 8px; margin: 20px 0; }
               .warning h2 { color: #ff4757; margin: 0 0 10px 0; }
               .countdown { color: #4ecdc4; font-weight: bold; }
@@ -87,9 +86,7 @@ jobs:
               const NEXT_KEY_TIME = "$NEXT_KEY";
               const TIMESTAMP = "$TIMESTAMP";
               
-              // Get token from URL fragment (#t=...)
-              // Fragments survive ALL redirects (Linkvertise can't strip them)
-              const hash = window.location.hash.substring(1); // remove the #
+              const hash = window.location.hash.substring(1);
               const params = new URLSearchParams(hash);
               const userToken = params.get('t');
               
@@ -143,5 +140,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add key.txt token.txt index.html
-          git commit -m "🔄 Rotate token (key=$([ "${{ steps.check.outputs.rotate_key }}" = "true" ] && echo 'ROTATED' || echo 'unchanged'))" || echo "No changes"
+          git commit -m "🔄 Rotate token/key" || echo "No changes"
           git push
