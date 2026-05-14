@@ -26,6 +26,31 @@ jobs:
             echo "rotate_key=false" >> $GITHUB_OUTPUT
           fi
 
+      - name: Determine if key should rotate (based on file age)
+        id: check
+        run: |
+          if [ ! -f key.txt ]; then
+            echo "rotate_key=true" >> $GITHUB_OUTPUT
+            echo "Reason: key.txt missing"
+          else
+            # Get age of key.txt in seconds (since last commit)
+            LAST_KEY_TIME=$(git log -1 --format=%ct -- key.txt 2>/dev/null || echo "0")
+            CURRENT_TIME=$(date +%s)
+            AGE_SECONDS=$((CURRENT_TIME - LAST_KEY_TIME))
+            AGE_HOURS=$((AGE_SECONDS / 3600))
+            
+            echo "Key age: $AGE_HOURS hours"
+            
+            # Rotate if older than 4 hours
+            if [ $AGE_HOURS -ge 4 ]; then
+              echo "rotate_key=true" >> $GITHUB_OUTPUT
+              echo "Reason: key is $AGE_HOURS hours old"
+            else
+              echo "rotate_key=false" >> $GITHUB_OUTPUT
+              echo "Reason: key only $AGE_HOURS hours old, not rotating yet"
+            fi
+          fi
+
       - name: Generate new key (every 4hrs)
         if: steps.check.outputs.rotate_key == 'true'
         run: |
@@ -34,13 +59,7 @@ jobs:
           PART3=$(openssl rand -hex 2 | tr 'a-f' 'A-F')
           NEW_KEY="LOGIC-${PART1}-${PART2}-${PART3}"
           printf "%s" "$NEW_KEY" > key.txt
-          echo "Generated key: $NEW_KEY"
-
-      - name: Generate new access token (every hour)
-        run: |
-          NEW_TOKEN=$(openssl rand -hex 8)
-          printf "%s" "$NEW_TOKEN" > token.txt
-          echo "Generated token: $NEW_TOKEN"
+          echo "Generated key: $NEW_KEY""
 
       - name: Build key page
         run: |
