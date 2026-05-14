@@ -64,7 +64,14 @@ jobs:
           git push
           cd ..
 
-      - name: Build key page for public repo
+      - name: Write hidden files to public repo
+        run: |
+          KEY=$(cat private/key.txt)
+          TOKEN=$(cat private/token.txt)
+          printf "%s" "$KEY" > d8f2a1.dat
+          printf "%s" "$TOKEN" > t9x3b7.dat
+
+      - name: Build key page
         run: |
           KEY=$(cat private/key.txt)
           cat > index.html << 'HTMLEOF'
@@ -91,9 +98,7 @@ jobs:
           </div>
           <script>
           HTMLEOF
-
           echo "var KEY = \"$KEY\";" >> index.html
-
           cat >> index.html << 'HTMLEOF2'
           document.getElementById('content').innerHTML =
             '<h1>Logic Hub Key</h1>' +
@@ -101,7 +106,6 @@ jobs:
             '<div class="key" onclick="copyKey()">' + KEY + '</div>' +
             '<button class="copy-btn" onclick="copyKey()">Copy Key</button>' +
             '<div class="info" style="margin-top:20px;font-size:12px;">Paste this key in the Logic Hub script.</div>';
-
           function copyKey() {
             navigator.clipboard.writeText(KEY);
             alert('Key copied!');
@@ -111,18 +115,11 @@ jobs:
           </html>
           HTMLEOF2
 
-        - name: Write hidden key file for script validation
-        run: |
-          KEY=$(cat private/key.txt)
-          TOKEN=$(cat private/token.txt)
-          printf "%s" "$KEY" > d8f2a1.dat
-          printf "%s" "$TOKEN" > t9x3b7.dat
-          
       - name: Commit public repo
         run: |
           rm -rf private
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add index.html
+          git add index.html d8f2a1.dat t9x3b7.dat
           git commit -m "Update key page" || echo "No changes"
           git push
