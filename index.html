@@ -1,82 +1,48 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Logic Hub | Key Access</title>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="pragma" content="no-cache">
-  <meta http-equiv="expires" content="0">
-  <style>
-    body { font-family: 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #1a1a2e, #16213e); color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-    .box { background: rgba(255,255,255,0.05); padding: 40px; border-radius: 16px; text-align: center; border: 1px solid rgba(255,255,255,0.1); max-width: 500px; }
-    h1 { color: #4ecdc4; margin-bottom: 10px; }
-    .key { font-family: 'Courier New', monospace; font-size: 28px; background: #0f3460; padding: 20px; border-radius: 8px; margin: 20px 0; color: #4ecdc4; letter-spacing: 2px; user-select: all; cursor: pointer; }
-    .info { color: #aaa; font-size: 14px; margin: 8px 0; }
-    .copy-btn { background: #4ecdc4; color: #16213e; border: none; padding: 12px 24px; font-size: 16px; border-radius: 8px; cursor: pointer; margin-top: 10px; font-weight: bold; }
-    .copy-btn:hover { background: #3db8af; }
-    .warning { background: rgba(255, 71, 87, 0.1); border: 1px solid #ff4757; padding: 20px; border-radius: 8px; margin: 20px 0; }
-    .warning h2 { color: #ff4757; margin: 0 0 10px 0; }
-    .countdown { color: #4ecdc4; font-weight: bold; }
-  </style>
+<title>Logic Hub | Key</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate">
+<style>
+body { font-family: 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #1a1a2e, #16213e); color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+.box { background: rgba(255,255,255,0.05); padding: 40px; border-radius: 16px; text-align: center; border: 1px solid rgba(255,255,255,0.1); max-width: 500px; }
+h1 { color: #4ecdc4; }
+.key { font-family: 'Courier New', monospace; font-size: 28px; background: #0f3460; padding: 20px; border-radius: 8px; margin: 20px 0; color: #4ecdc4; letter-spacing: 2px; user-select: all; cursor: pointer; }
+.info { color: #aaa; font-size: 14px; margin: 8px 0; }
+.copy-btn { background: #4ecdc4; color: #16213e; border: none; padding: 12px 24px; font-size: 16px; border-radius: 8px; cursor: pointer; margin-top: 10px; font-weight: bold; }
+.warning { background: rgba(255,71,87,0.1); border: 1px solid #ff4757; padding: 20px; border-radius: 8px; margin: 20px 0; }
+.warning h2 { color: #ff4757; margin: 0 0 10px 0; }
+</style>
 </head>
 <body>
-  <div class="box" id="content">
-    <h1>🔑 Logic Hub Key</h1>
-    <div id="status">Validating access...</div>
-  </div>
-  
-  <script>
-    const VALID_TOKEN = "d2f58db5b8497f93";
-    const KEY = "LOGIC-ECA3-9A24-DAB4";
-    const NEXT_TOKEN_TIME = "2026-05-14 22:01 UTC";
-    const NEXT_KEY_TIME = "2026-05-15 01:01 UTC";
-    const TIMESTAMP = "2026-05-14 21:01 UTC";
-    
-    const hash = window.location.hash.substring(1);
-    const params = new URLSearchParams(hash);
-    const userToken = params.get('t');
-    
-    const content = document.getElementById('content');
-    
-    if (!userToken) {
-      content.innerHTML = `
-        <h1 style="color:#ff4757;">⚠️ Direct Access Blocked</h1>
-        <div class="warning">
-          <h2>🔒 Token Required</h2>
-          <p>You must access this page through the official link in the script.</p>
-          <p style="font-size:12px;color:#aaa;margin-top:15px;">Tokens expire every hour. Bookmarking won't work — get a fresh link from the Logic Hub script.</p>
-        </div>
-      `;
-    } else if (userToken !== VALID_TOKEN) {
-      content.innerHTML = `
-        <h1 style="color:#ff4757;">❌ Token Expired</h1>
-        <div class="warning">
-          <h2>⏰ This link has expired</h2>
-          <p>Access tokens rotate every hour to prevent abuse.</p>
-          <p>Run the Logic Hub script again to get a fresh link.</p>
-          <p style="font-size:12px;color:#aaa;margin-top:15px;">Updated: ${TIMESTAMP}</p>
-        </div>
-      `;
-    } else {
-      content.innerHTML = `
-        <h1>🔑 Logic Hub Key</h1>
-        <div class="info">✅ Token Valid | Generated: ${TIMESTAMP}</div>
-        <div class="key" id="key" onclick="copyKey()">${KEY}</div>
-        <button class="copy-btn" onclick="copyKey()">📋 Copy Key</button>
-        <div class="info">⏰ Token expires: <span class="countdown">${NEXT_TOKEN_TIME}</span></div>
-        <div class="info">🔄 Next key refresh: <span class="countdown">${NEXT_KEY_TIME}</span></div>
-        <div class="info" style="margin-top: 20px; font-size: 12px;">
-          ⚠️ Keys rotate every 4 hours. Tokens rotate every hour.<br>
-          Bookmarking won't work — always get fresh link from script.
-        </div>
-      `;
-    }
-    
-    function copyKey() {
-      navigator.clipboard.writeText(KEY);
-      alert("Key copied to clipboard!");
-    }
-  </script>
+<div class="box" id="content">
+<h1>Loading...</h1>
+</div>
+<script>
+var VALID_TOKEN = "50c44f07bc819c48";
+var KEY = "LOGIC-F7C0-1196-DF74";
+var TIMESTAMP = "2026-05-14 21:09 UTC";
+var NEXT_TOKEN_TIME = "2026-05-14 22:09 UTC";
+var NEXT_KEY_TIME = "2026-05-15 01:09 UTC";
+var hash = window.location.hash.substring(1);
+var params = new URLSearchParams(hash);
+var userToken = params.get('t');
+var content = document.getElementById('content');
+
+if (!userToken) {
+  content.innerHTML = '<h1 style="color:#ff4757;">⚠️ Direct Access Blocked</h1><div class="warning"><h2>🔒 Token Required</h2><p>You must access this page through the official link in the script.</p><p style="font-size:12px;color:#aaa;margin-top:15px;">Tokens expire every hour. Bookmarking won\'t work.</p></div>';
+} else if (userToken !== VALID_TOKEN) {
+  content.innerHTML = '<h1 style="color:#ff4757;">❌ Token Expired</h1><div class="warning"><h2>⏰ This link has expired</h2><p>Tokens rotate every hour.</p><p>Run the Logic Hub script again for a fresh link.</p></div>';
+} else {
+  content.innerHTML = '<h1>🔑 Logic Hub Key</h1><div class="info">✅ Valid | ' + TIMESTAMP + '</div><div class="key" onclick="copyKey()">' + KEY + '</div><button class="copy-btn" onclick="copyKey()">📋 Copy Key</button><div class="info">⏰ Token expires: ' + NEXT_TOKEN_TIME + '</div><div class="info">🔄 Key refresh: ' + NEXT_KEY_TIME + '</div><div class="info" style="margin-top:20px;font-size:12px;">Keys rotate every 4 hours. Tokens rotate every hour.</div>';
+}
+
+function copyKey() {
+  navigator.clipboard.writeText(KEY);
+  alert("Key copied!");
+}
+</script>
 </body>
 </html>
