@@ -25,7 +25,6 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:
 .features{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:28px;text-align:left}
 .feature{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:10px;padding:14px;transition:all .3s ease}
 .feature:hover{border-color:rgba(212,175,55,.15);background:rgba(212,175,55,.03)}
-.feature-icon{font-size:18px;margin-bottom:6px}
 .feature-title{font-size:12px;color:rgba(255,255,255,.7);font-weight:600;margin-bottom:2px}
 .feature-desc{font-size:10px;color:rgba(255,255,255,.25);line-height:1.4}
 .steps{text-align:left;margin-bottom:28px}
@@ -130,20 +129,10 @@ function createParticle(){return{x:Math.random()*canvas.width,y:canvas.height+10
 for(var i=0;i<40;i++){var p=createParticle();p.y=Math.random()*canvas.height;p.life=Math.random()*p.maxLife;particles.push(p)}
 function animateParticles(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(function(p,idx){p.y-=p.speedY;p.x+=p.speedX;p.life++;var fadeRatio=1;if(p.life>p.maxLife*0.7){fadeRatio=1-(p.life-p.maxLife*0.7)/(p.maxLife*0.3)}ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fillStyle='rgba(212,175,55,'+(p.opacity*fadeRatio)+')';ctx.fill();if(p.life>=p.maxLife||p.y<-10){particles[idx]=createParticle()}});requestAnimationFrame(animateParticles)}
 animateParticles();
-
-// Fake user counter with animation
 var target=Math.floor(Math.random()*150)+200;
 var current=0;
 var counter=document.getElementById('userCount');
-function animateCounter(){
-    if(current<target){
-        current+=Math.ceil((target-current)/20);
-        counter.textContent=current;
-        requestAnimationFrame(animateCounter);
-    }else{
-        counter.textContent=target;
-    }
-}
+function animateCounter(){if(current<target){current+=Math.ceil((target-current)/20);counter.textContent=current;requestAnimationFrame(animateCounter)}else{counter.textContent=target}}
 setTimeout(animateCounter,800);
 </script>
 </body>
