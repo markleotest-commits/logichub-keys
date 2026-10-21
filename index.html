@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Logic Hub</title>
+<meta property="og:title" content="Logic Hub — Active Key">
+<meta property="og:description" content="Get your free 4-hour access key for Logic Hub v3.5.">
+<meta property="og:theme-color" content="#d4af37">
+<meta property="og:type" content="website">
 <meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23d4af37'/><text x='50' y='72' font-size='60' font-family='Arial' font-weight='bold' text-anchor='middle' fill='%230a0a0a'>L</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -69,15 +73,25 @@ function resizeCanvas(){canvas.width=window.innerWidth;canvas.height=window.inne
 resizeCanvas();window.addEventListener('resize',resizeCanvas);
 function createParticle(){return{x:Math.random()*canvas.width,y:canvas.height+10,size:Math.random()*2+0.5,speedY:Math.random()*0.8+0.2,speedX:(Math.random()-0.5)*0.3,opacity:Math.random()*0.4+0.1,life:0,maxLife:Math.random()*400+200}}
 for(var i=0;i<40;i++){var p=createParticle();p.y=Math.random()*canvas.height;p.life=Math.random()*p.maxLife;particles.push(p)}
-function animateParticles(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(function(p,idx){p.y-=p.speedY;p.x+=p.speedX;p.life++;var fadeRatio=1;if(p.life>p.maxLife*0.7){fadeRatio=1-(p.life-p.maxLife*0.7)/(p.maxLife*0.3)}ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fillStyle='rgba(212,175,55,'+(p.opacity*fadeRatio)+')';ctx.fill();if(p.life>=p.maxLife||p.y<-10){particles[idx]=createParticle()}});requestAnimationFrame(animateParticles)}
+function animateParticles(){if(!document.hidden){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(function(p,idx){p.y-=p.speedY;p.x+=p.speedX;p.life++;var fadeRatio=1;if(p.life>p.maxLife*0.7){fadeRatio=1-(p.life-p.maxLife*0.7)/(p.maxLife*0.3)}ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fillStyle='rgba(212,175,55,'+(p.opacity*fadeRatio)+')';ctx.fill();if(p.life>=p.maxLife||p.y<-10){particles[idx]=createParticle()}})}requestAnimationFrame(animateParticles)}
 animateParticles();
 
-function getCountdown(){var now=new Date();var hours=3-now.getUTCHours()%4;var mins=59-now.getUTCMinutes();var secs=59-now.getUTCSeconds();return(hours<10?'0':'')+hours+':'+(mins<10?'0':'')+mins+':'+(secs<10?'0':'')+secs}
+function getCountdown(expiresAt){
+    if(!expiresAt){
+        var now=new Date();
+        var hours=3-now.getUTCHours()%4;
+        var mins=59-now.getUTCMinutes();
+        var secs=59-now.getUTCSeconds();
+        return(hours<10?'0':'')+hours+':'+(mins<10?'0':'')+mins+':'+(secs<10?'0':'')+secs;
+    }
+    var remain = Math.max(0, Math.floor(expiresAt - Date.now() / 1000));
+    var hours = Math.floor(remain / 3600);
+    var mins = Math.floor((remain % 3600) / 60);
+    var secs = remain % 60;
+    return (hours<10?'0':'')+hours+':'+(mins<10?'0':'')+mins+':'+(secs<10?'0':'')+secs;
+}
 
-fetch('https://raw.githubusercontent.com/markleotest-commits/logichub-keys/main/d8f2a1.dat?nc='+Date.now())
-.then(function(r){return r.text()})
-.then(function(key){
-    key=key.trim();
+function renderKeyUI(key, expiresAt){
     window.currentKey=key;
     var c=document.getElementById('content');
     c.innerHTML=
@@ -89,7 +103,7 @@ fetch('https://raw.githubusercontent.com/markleotest-commits/logichub-keys/main/
             '<div class="key-value">'+key+'</div>'+
         '</div>'+
         '<button class="copy-btn" id="copyBtn" onclick="copyKey()">Copy Key</button>'+
-        '<div class="countdown"><span class="countdown-label">Key refreshes in</span><span class="countdown-value" id="timer">'+getCountdown()+'</span></div>'+
+        '<div class="countdown"><span class="countdown-label">Key refreshes in</span><span class="countdown-value" id="timer">'+getCountdown(expiresAt)+'</span></div>'+
         '<div class="divider"></div>'+
         '<div class="info-grid">'+
             '<div class="info-item"><div class="label">Refreshes</div><div class="value">Every 4 hours</div></div>'+
@@ -97,14 +111,40 @@ fetch('https://raw.githubusercontent.com/markleotest-commits/logichub-keys/main/
         '</div>'+
         '<div class="footer">Paste this key in the Logic Hub script prompt to unlock.</div>'+
         '<div class="version">Logic Hub v3.5</div>';
-    setInterval(function(){var el=document.getElementById('timer');if(el)el.textContent=getCountdown()},1000);
-})
-.catch(function(){
-    document.getElementById('content').innerHTML=
-        '<div class="logo logo-error">!</div>'+
-        '<div class="title" style="color:#e74c3c">Error</div>'+
-        '<div class="subtitle">Could not load key. Try refreshing.</div>';
-});
+    if(window.timerInterval) clearInterval(window.timerInterval);
+    window.timerInterval = setInterval(function(){
+        var el=document.getElementById('timer');
+        if(el)el.textContent=getCountdown(expiresAt);
+    },1000);
+}
+
+function loadKey(retries){
+    retries = typeof retries === 'number' ? retries : 2;
+    fetch('https://raw.githubusercontent.com/markleotest-commits/logichub-keys/main/metadata.json?nc='+Date.now())
+    .then(function(r){if(!r.ok)throw new Error('Network error');return r.json()})
+    .then(function(data){
+        renderKeyUI(data.key, data.expires_at);
+    })
+    .catch(function(){
+        fetch('https://raw.githubusercontent.com/markleotest-commits/logichub-keys/main/d8f2a1.dat?nc='+Date.now())
+        .then(function(r){if(!r.ok)throw new Error('Network error');return r.text()})
+        .then(function(key){
+            renderKeyUI(key.trim(), null);
+        })
+        .catch(function(){
+            if(retries > 0){
+                setTimeout(function(){loadKey(retries - 1)}, 1000);
+            } else {
+                document.getElementById('content').innerHTML=
+                    '<div class="logo" style="background:#e74c3c">!</div>'+
+                    '<div class="title" style="color:#e74c3c">Error</div>'+
+                    '<div class="subtitle" style="margin-bottom:20px">Could not load key. Try refreshing.</div>'+
+                    '<button class="copy-btn" onclick="loadKey(2)">Retry</button>';
+            }
+        });
+    });
+}
+loadKey(2);
 
 function copyKey(){
     if(window.currentKey){
